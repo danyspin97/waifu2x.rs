@@ -31,7 +31,9 @@ PixelShuffle_arm::PixelShuffle_arm()
 #endif
 #endif // __ARM_NEON
 
+#if NCNN_BF16
     support_bf16_storage = true;
+#endif
 }
 
 int PixelShuffle_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Option& opt) const
@@ -43,8 +45,10 @@ int PixelShuffle_arm::forward(const Mat& bottom_blob, Mat& top_blob, const Optio
         return forward_bf16s_fp16s(bottom_blob, top_blob, opt);
 #endif
 
+#if NCNN_BF16
     if (opt.use_bf16_storage && elembits == 16)
         return forward_bf16s_fp16s(bottom_blob, top_blob, opt);
+#endif
 
     int w = bottom_blob.w;
     int h = bottom_blob.h;
@@ -232,7 +236,11 @@ int PixelShuffle_arm::forward_bf16s_fp16s(const Mat& bottom_blob, Mat& top_blob,
     int out_elempack = 1;
     if (opt.use_packing_layout)
     {
+#if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
         out_elempack = opt.use_fp16_arithmetic && outc % 8 == 0 ? 8 : outc % 4 == 0 ? 4 : 1;
+#else
+        out_elempack = outc % 4 == 0 ? 4 : 1;
+#endif
     }
     size_t out_elemsize = elemsize / elempack * out_elempack;
 

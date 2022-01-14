@@ -25,7 +25,9 @@ Slice_arm::Slice_arm()
 #endif
 #endif // __ARM_NEON
 
+#if NCNN_BF16
     support_bf16_storage = true;
+#endif
 }
 
 int Slice_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& top_blobs, const Option& opt) const
@@ -37,8 +39,10 @@ int Slice_arm::forward(const std::vector<Mat>& bottom_blobs, std::vector<Mat>& t
         return forward_bf16s_fp16s(bottom_blobs, top_blobs, opt);
 #endif
 
+#if NCNN_BF16
     if (opt.use_bf16_storage && elembits == 16)
         return forward_bf16s_fp16s(bottom_blobs, top_blobs, opt);
+#endif
 
     const Mat& bottom_blob = bottom_blobs[0];
     int dims = bottom_blob.dims;
@@ -396,7 +400,11 @@ int Slice_arm::forward_bf16s_fp16s(const std::vector<Mat>& bottom_blobs, std::ve
             int out_elempack = 1;
             if (opt.use_packing_layout)
             {
+#if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
                 out_elempack = opt.use_fp16_arithmetic && slice % 8 == 0 ? 8 : slice % 4 == 0 ? 4 : 1;
+#else
+                out_elempack = slice % 4 == 0 ? 4 : 1;
+#endif
             }
             size_t out_elemsize = elemsize / elempack * out_elempack;
 
@@ -431,7 +439,11 @@ int Slice_arm::forward_bf16s_fp16s(const std::vector<Mat>& bottom_blobs, std::ve
             int out_elempack = 1;
             if (opt.use_packing_layout)
             {
+#if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
                 out_elempack = opt.use_fp16_arithmetic && slice % 8 == 0 ? 8 : slice % 4 == 0 ? 4 : 1;
+#else
+                out_elempack = slice % 4 == 0 ? 4 : 1;
+#endif
             }
             size_t out_elemsize = elemsize / elempack * out_elempack;
 
@@ -618,7 +630,11 @@ int Slice_arm::forward_bf16s_fp16s(const std::vector<Mat>& bottom_blobs, std::ve
             int out_elempack = 1;
             if (opt.use_packing_layout)
             {
+#if __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
                 out_elempack = opt.use_fp16_arithmetic && slice % 8 == 0 ? 8 : slice % 4 == 0 ? 4 : 1;
+#else
+                out_elempack = slice % 4 == 0 ? 4 : 1;
+#endif
             }
             size_t out_elemsize = elemsize / elempack * out_elempack;
 
