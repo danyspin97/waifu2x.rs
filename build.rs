@@ -48,14 +48,16 @@ fn main() {
         env::var("DEP_NCNN_LIBRARY").unwrap()
     );
     println!("cargo:rustc-link-lib=static:-bundle={}", "ncnn");
-    println!(
-        "cargo:rustc-link-lib=static:-bundle={}",
-        "MachineIndependent"
-    );
-    println!("cargo:rustc-link-lib=static:-bundle={}", "SPIRV");
-    println!("cargo:rustc-link-lib=static:-bundle={}", "GenericCodeGen");
-    println!("cargo:rustc-link-lib=static:-bundle={}", "OSDependent");
-    println!("cargo:rustc-link-lib=static:-bundle={}", "OGLCompiler");
+    // println!(
+    //     "cargo:rustc-link-lib=static:-bundle={}",
+    //     "MachineIndependent"
+    // );
+    println!("cargo:rustc-link-lib=dylib={}", "glslang");
+    println!("cargo:rustc-link-lib=dylib={}", "SPIRV");
+    //println!("cargo:rustc-link-lib=static:-bundle={}", "SPIRV");
+    //println!("cargo:rustc-link-lib=static:-bundle={}", "GenericCodeGen");
+    //println!("cargo:rustc-link-lib=static:-bundle={}", "OSDependent");
+    //println!("cargo:rustc-link-lib=static:-bundle={}", "OGLCompiler");
     println!(
         "cargo:rustc-link-search=native={}",
         env::var("DEP_NCNN_VULKAN_LIB").unwrap()
@@ -63,8 +65,8 @@ fn main() {
     if cfg!(windows) {
         println!("cargo:rustc-link-lib=static={}", "vulkan-1");
     } else {
-        println!("cargo:rustc-link-lib=static={}", "gomp");
-        println!("cargo:rustc-link-lib=static={}", "stdc++");
+        println!("cargo:rustc-link-lib=dylib={}", "gomp");
+        println!("cargo:rustc-link-lib=dylib={}", "stdc++");
         println!("cargo:rustc-link-lib=dylib={}", "vulkan");
     }
 }
