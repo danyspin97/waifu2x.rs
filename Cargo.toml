@@ -22,7 +22,7 @@ model_bundled = []
 
 [dependencies]
 libc = "0.2.98"
-ncnn-sys = "0.1.4"
+ncnn-sys = { git = "https://github.com/danyspin97/waifu2x.rs", branch = "ncnn-sys" }
 
 [dependencies.image]
 version = "0.23.14"
